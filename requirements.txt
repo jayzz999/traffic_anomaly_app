@@ -1,0 +1,38 @@
+# Traffic Anomaly Detection System - Requirements
+# Compatible with TensorFlow 2.16 on Python 3.11+
+
+# Deep Learning & ML
+# For Mac ARM64 (M1/M2/M3), use tensorflow-macos
+tensorflow==2.16.2
+tensorflow-macos==2.16.2; platform_system == "Darwin" and platform_machine == "arm64"
+tensorflow-metal; platform_system == "Darwin" and platform_machine == "arm64"
+keras>=2.13.0
+scikit-learn>=1.3.0
+
+# Protobuf version must be <5.0 for compatibility with Google packages
+protobuf>=4.0,<5.0
+
+# Computer Vision
+opencv-python>=4.8.0
+Pillow>=10.0.0
+
+# Signal Processing
+PyWavelets>=1.4.1
+
+# Web Framework
+streamlit>=1.28.0
+
+# Data Processing
+# CRITICAL: NumPy must be <2.0 for TensorFlow 2.16
+numpy>=1.26.0,<2.0.0
+pandas>=2.0.0
+
+# Visualization
+plotly>=5.17.0
+matplotlib>=3.7.0
+
+# Progress Bars
+tqdm>=4.66.0
+
+# Utilities
+python-dateutil>=2.8.2
