@@ -20,7 +20,7 @@ def load_trained_model():
     """
     try:
         if config.MODEL_PATH.exists():
-            model = load_model(str(config.MODEL_PATH))
+                model = load_model(str(config.MODEL_PATH), compile=False)
             return model
         else:
             st.error(f"Model not found at {config.MODEL_PATH}")
