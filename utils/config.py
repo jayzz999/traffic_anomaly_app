@@ -22,7 +22,7 @@ class AppConfig:
     # Model settings
     MODEL_NAME = "improved_model.h5"
     MODEL_PATH = MODEL_DIR / MODEL_NAME
-    IMAGE_SIZE = (128, 128)
+    IMAGE_SIZE = (128, 128)  # Model input size
     
     # Class names and colors
     CLASS_NAMES = ['accident', 'dense_traffic', 'fire', 'sparse_traffic']

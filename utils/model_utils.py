@@ -12,6 +12,18 @@ from utils.config import AppConfig
 
 config = AppConfig()
 
+def load_model_with_custom_objects(model_path):
+    """
+    Load model with custom objects to handle complex architectures
+    """
+    # Now that improved_model.h5 has been replaced with the working model,
+    # we can load it normally
+    try:
+        model = load_model(str(model_path), compile=False)
+        return model
+    except Exception as e:
+        raise Exception(f"Failed to load model: {str(e)}")
+
 @st.cache_resource
 def load_trained_model():
     """
@@ -19,14 +31,35 @@ def load_trained_model():
     Returns the loaded Keras model
     """
     try:
-        if config.MODEL_PATH.exists():
-                model = load_model(str(config.MODEL_PATH), compile=False)
-            return model
-        else:            st.error(f"Model not found at {config.MODEL_PATH}")
-            st.info("Please place your trained model file 'improved_model.h5' in the 'models' directory")
-            return None
+        # Define model paths with loading strategies
+        model_configs = [
+            (config.MODEL_PATH, 'custom'),  # Try improved_model.h5 with custom objects
+            (config.MODEL_DIR / "best_model.h5", 'standard')  # Try best_model.h5 with standard loading
+        ]
+
+        for model_path, load_method in model_configs:
+            if model_path.exists():
+                try:
+                    if load_method == 'custom':
+                        # Use custom objects loading for improved_model.h5
+                        model = load_model_with_custom_objects(model_path)
+                        st.success(f"✅ Model loaded from {model_path.name}")
+                        return model
+                    else:
+                        # Standard loading for best_model.h5
+                        model = load_model(str(model_path), compile=False)
+                        st.success(f"✅ Model loaded from {model_path.name}")
+                        return model
+                except Exception as e:
+                    st.warning(f"⚠️ Failed to load {model_path.name}: {str(e)}")
+                    continue
+
+        st.error("❌ Could not load any model file")
+        st.info("Please ensure 'improved_model.h5' or 'best_model.h5' exists in the 'models' directory")
+        return None
+
     except Exception as e:
-        st.error(f"Error loading model: {str(e)}")
+        st.error(f"❌ Error loading model: {str(e)}")
         return None
 
 def extract_wavelet_features(image, wavelet='haar', level=2):
