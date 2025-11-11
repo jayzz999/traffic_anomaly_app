@@ -20,7 +20,7 @@ class AppConfig:
     OUTPUT_DIR.mkdir(exist_ok=True)
     
     # Model settings
-    MODEL_NAME = "best_model.h5"
+    MODEL_NAME = "improved_model.h5"
     MODEL_PATH = MODEL_DIR / MODEL_NAME
     IMAGE_SIZE = (128, 128)
     
