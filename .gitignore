@@ -42,7 +42,6 @@ env/
 *.h5
 *.pkl
 *.joblib
-models/*.h5
 models/*.pkl
 
 # Output files
