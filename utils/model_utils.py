@@ -21,8 +21,8 @@ def load_trained_model():
     try:
         if config.MODEL_PATH.exists():
                 model = load_model(str(config.MODEL_PATH), compile=False)
-            return model        else:
-            st.error(f"Model not found at {config.MODEL_PATH}")
+            return model
+        else:            st.error(f"Model not found at {config.MODEL_PATH}")
             st.info("Please place your trained model file 'improved_model.h5' in the 'models' directory")
             return None
     except Exception as e:
