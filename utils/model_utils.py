@@ -24,7 +24,7 @@ def load_trained_model():
             return model
         else:
             st.error(f"Model not found at {config.MODEL_PATH}")
-            st.info("Please place your trained model file 'best_model.h5' in the 'models' directory")
+            st.info("Please place your trained model file 'improved_model.h5' in the 'models' directory")
             return None
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
