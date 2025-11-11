@@ -25,7 +25,7 @@ from .visualization import (
 )
 
 __all__ = [
-        'AppConfig',
+    'AppConfig',
     'load_trained_model',
     'preprocess_image',
     'predict_single_image',
