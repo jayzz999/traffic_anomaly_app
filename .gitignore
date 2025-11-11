@@ -39,10 +39,9 @@ env/
 .DS_Store
 
 # Model files (usually too large for git)
-*.h5
 *.pkl
 *.joblib
-models/*.pkl
+
 
 # Output files
 outputs/
