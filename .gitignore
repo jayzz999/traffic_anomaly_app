@@ -54,3 +54,15 @@ temp/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Simulation output
+simulation_output/
+
+# SQLite databases
+*.db
+
+# Edge deployment
+deploy/.env
+
+# Large model files (keep .h5 in models/)
+# models/*.h5

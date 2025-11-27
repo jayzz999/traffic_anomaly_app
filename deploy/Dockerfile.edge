@@ -1,0 +1,84 @@
+# Dockerfile for Edge Deployment
+# Optimized for ARM64 (Raspberry Pi 4) and AMD64 architectures
+
+# Multi-architecture base image
+FROM python:3.10-slim-bullseye
+
+# Build arguments
+ARG TARGETARCH
+ARG TARGETPLATFORM
+
+# Labels
+LABEL maintainer="Traffic Anomaly Detection Team"
+LABEL description="Edge processor for traffic anomaly detection with RTA Dubai integration"
+LABEL version="1.0"
+
+# Environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    TF_CPP_MIN_LOG_LEVEL=2 \
+    CUDA_VISIBLE_DEVICES=-1 \
+    DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    libatlas-base-dev \
+    libhdf5-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libfreetype6-dev \
+    libopenblas-dev \
+    v4l-utils \
+    sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create application directory
+WORKDIR /app
+
+# Create non-root user
+RUN useradd -m -s /bin/bash appuser && \
+    chown -R appuser:appuser /app
+
+# Copy requirements first for layer caching
+COPY requirements.txt .
+
+# Install Python dependencies based on architecture
+RUN pip install --no-cache-dir --upgrade pip wheel setuptools && \
+    if [ "$TARGETARCH" = "arm64" ]; then \
+        pip install --no-cache-dir tflite-runtime; \
+    else \
+        pip install --no-cache-dir tensorflow-cpu; \
+    fi && \
+    pip install --no-cache-dir \
+        numpy>=1.21.0,<2.0 \
+        opencv-python-headless>=4.5.0 \
+        Pillow>=9.0.0 \
+        pywavelets>=1.3.0 \
+        scikit-learn>=1.0.0 \
+        tqdm>=4.60.0 \
+        python-dateutil>=2.8.0
+
+# Copy application code
+COPY --chown=appuser:appuser . .
+
+# Create data directories
+RUN mkdir -p /app/data /app/logs /app/models && \
+    chown -R appuser:appuser /app/data /app/logs /app/models
+
+# Switch to non-root user
+USER appuser
+
+# Expose no ports (edge device pushes data)
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD python -c "import sys; sys.exit(0)"
+
+# Default command
+CMD ["python", "edge_runner.py", "--camera", "0"]

@@ -1,0 +1,79 @@
+# Docker Compose for Edge Deployment
+# Suitable for Raspberry Pi 4 and similar edge devices
+
+version: '3.8'
+
+services:
+  traffic-edge:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.edge
+    container_name: traffic-anomaly-edge
+    restart: unless-stopped
+
+    # Environment configuration
+    env_file:
+      - .env
+
+    environment:
+      - EDGE_DEVICE_ID=${EDGE_DEVICE_ID:-edge-001}
+      - CAMERA_ID=${CAMERA_ID:-cam-001}
+      - LOCATION_ID=${LOCATION_ID:-intersection-001}
+      - RTA_API_URL=${RTA_API_URL:-https://api.rta.ae/traffic/v1}
+      - RTA_API_KEY=${RTA_API_KEY:-}
+      - TF_CPP_MIN_LOG_LEVEL=2
+      - CUDA_VISIBLE_DEVICES=-1
+
+    # Mount points
+    volumes:
+      # Persistent data storage
+      - edge-data:/app/data
+      # Log files
+      - edge-logs:/app/logs
+      # Model files (mount from host)
+      - ../models:/app/models:ro
+      # Camera device access (for USB cameras)
+      - /dev/video0:/dev/video0
+
+    # Device access for cameras
+    devices:
+      - /dev/video0:/dev/video0
+
+    # Group membership for video device access
+    group_add:
+      - video
+
+    # Resource limits for Raspberry Pi
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '2'
+        reservations:
+          memory: 512M
+          cpus: '1'
+
+    # Network configuration
+    network_mode: host
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+# Named volumes for persistent data
+volumes:
+  edge-data:
+    driver: local
+  edge-logs:
+    driver: local
